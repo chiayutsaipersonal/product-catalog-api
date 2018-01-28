@@ -1,0 +1,53 @@
+{
+  "name": "product-catalog-api",
+  "version": "0.0.1",
+  "description": "product website backend project in Node.js with Express.js framework",
+  "main": "server.js",
+  "keywords": [
+    "product",
+    "catalog",
+    "node",
+    "express"
+  ],
+  "author": "Chia-Yu Tsai",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.2",
+    "fs-extra": "^5.0.0",
+    "moment": "^2.20.1",
+    "moment-timezone": "^0.5.14",
+    "multer": "^1.3.0",
+    "sequelize": "^4.32.2",
+    "serve-favicon": "^2.4.5",
+    "sqlite3": "^3.1.13",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "cross-env": "^5.1.3",
+    "eslint": "^4.16.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.0.0",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.14.11",
+    "request": "^2.83.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  }
+}
