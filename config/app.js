@@ -1,7 +1,8 @@
 module.exports = {
   mode: process.env.NODE_ENV === 'development',
   port: normalizePort(process.env.PORT || '9004'),
-  reference: 'sauTian',
+  reference: 'gentryWay',
+  title: '仲群維企業有限公司',
 }
 
 function normalizePort (val) {

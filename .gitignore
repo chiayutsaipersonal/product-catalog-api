@@ -4,5 +4,6 @@ backup/
 deprecated/
 data/
 dist/
+coverage/
 
 .env
