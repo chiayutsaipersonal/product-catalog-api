@@ -6,6 +6,7 @@ const Promise = require('bluebird')
 /* load controller modules */
 const logging = require('./controllers/logging')
 const viewEngine = require('./controllers/viewEngine')
+const database = require('./controllers/database')
 
 /* load routing modules */
 const preRouting = require('./controllers/preRouting')
@@ -30,6 +31,7 @@ logging.warning('Register server [pre-startup] initialization sequence')
 const preStartupInitSequence = [
   viewEngine(app),
   logging.init(app),
+  database.init(),
   preRouting.init(app),
   apiRouter.init(app),
   assetRouter.init(app),
