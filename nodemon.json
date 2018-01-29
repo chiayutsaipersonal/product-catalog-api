@@ -9,7 +9,8 @@
   ],
   "ignore": [],
   "env": {
-    "NODE_ENV": "development"
+    "NODE_ENV": "development",
+    "PORT": 9004
   },
   "runOnChangeOnly": false,
   "verbose": false
