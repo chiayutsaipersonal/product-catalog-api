@@ -32,6 +32,7 @@ const preStartupInitSequence = [
   viewEngine(app),
   logging.init(app),
   database.init(),
+  database.ensureAdmin(),
   preRouting.init(app),
   apiRouter.init(app),
   assetRouter.init(app),
@@ -94,5 +95,17 @@ Promise
     logging.error(error, 'Server initialization failure...')
     process.exit(1)
   })
+
+// event listeners to capture unhandled events and issues
+process.on('unhandledRejection', (error, promise) => {
+  logging.error(error, '發現未處理的 Promise Rejection')
+  return logging.warning(promise)
+})
+process.on('rejectionHandled', promise => {
+  return logging.warning('Rejection handled !!!')
+})
+process.on('uncaughtException', error => {
+  return logging.error(error, '發生未預期 exception !!!')
+})
 
 module.exports = server

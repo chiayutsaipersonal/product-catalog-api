@@ -1,11 +1,15 @@
 const fileExists = require('file-exists')
 const fs = require('fs-extra')
+const inquirer = require('inquirer')
+const isemail = require('isemail')
 const path = require('path')
 const Sequelize = require('sequelize')
 
+const appConfig = require('../../config/app')
 const dbConfig = require('../../config/database')
 
-const logging = require('../../controllers/logging')
+const logging = require('../logging')
+const encryption = require('../encryption')
 
 const sequelize = new Sequelize(dbConfig)
 
@@ -27,9 +31,13 @@ const db = {
 
 module.exports = {
   db,
-  init,
+  init, // create or sync depending on the existence of the db file
   create,
+  sync,
+  ensureAdmin,
 }
+
+const contactQueries = require('../../models/queries/contacts')
 
 function create () {
   return fs.ensureDir(path.resolve('./data'))
@@ -153,4 +161,109 @@ function injectOptions (foreignKey, targetKey, throughModel = null, otherKey = n
   throughModel === null ? {} : { through: throughModel },
   otherKey === null ? {} : { otherKey: otherKey }
   )
+}
+
+function ensureAdmin () {
+  return contactQueries
+    .verifyAdminAccount()
+    .then(queryResults => queryResults
+      ? Promise.resolve('Admin account validated')
+      : createAdminAccountFromConsole())
+    .then(resultMessage => Promise.resolve(resultMessage))
+    .catch(error => {
+      logging.error(error, 'Mandatory administrator account missing')
+      return Promise.reject(error)
+    })
+}
+
+function createAdminAccountFromConsole () {
+  let email = null
+  let encrypted = null
+  return consentToCreate()
+    .then(response => {
+      if (!response.consent) {
+        logging.warning('Declined to create Admin account')
+        return process.exit(0)
+      }
+      email = response.email
+      return getPassword()
+    })
+    .then(response => {
+      encrypted = encryption.sha512(response, encryption.saltGen(16))
+      return finalConfirmation()
+    })
+    .then(response => {
+      if (!response) {
+        logging.warning('Declined to create Admin account')
+        return process.exit(0)
+      }
+      return contactQueries.insert({
+        email,
+        name: 'Administrator',
+        hashedPassword: encrypted.hashedPassword,
+        salt: encrypted.salt,
+        admin: true,
+      })
+    })
+    .then(() => Promise.resolve('Admin account created'))
+    .catch(error => Promise.reject(error))
+}
+
+function consentToCreate () {
+  return inquirer
+    .prompt([{
+      type: 'confirm',
+      name: 'consent',
+      message: 'Required admin account is missing, create it?',
+      default: true,
+    }, {
+      type: 'input',
+      name: 'email',
+      message: 'Enter email of admin account: ',
+      default: appConfig.default.adminEmail,
+      filter: input => input.toLowerCase(),
+      validate: input => isemail.validate(input) ? true : 'invalid email format',
+      when: response => response.consent,
+    }])
+    .then(response => Promise.resolve(response))
+}
+
+function validateLength (stringValue) {
+  return (stringValue.length >= 8) && (stringValue.length <= 20)
+}
+
+function getPassword () {
+  return inquirer
+    .prompt([{
+      type: 'password',
+      name: 'password',
+      message: 'Enter admin password: ',
+      default: appConfig.default.adminPassword,
+      validate: input => validateLength(input) ? true : 'password length must be 8~20 characters',
+    }, {
+      type: 'password',
+      name: 'confirmedPassword',
+      message: 'Confirm and enter admin password again: ',
+      default: appConfig.default.adminPassword,
+      validate: input => validateLength(input) ? true : 'password length must be 8~20 characters',
+    }])
+    .then(response => {
+      if (response.password === response.confirmedPassword) {
+        return Promise.resolve(response.password)
+      } else {
+        logging.warning('Passwords did not match...')
+        return getPassword()
+      }
+    })
+}
+
+function finalConfirmation () {
+  return inquirer
+    .prompt([{
+      type: 'confirm',
+      name: 'finalConfirmation',
+      message: 'Please confirm to create the administration account?',
+      default: false,
+    }])
+    .then(response => Promise.resolve(response.finalConfirmation))
 }
