@@ -5,28 +5,28 @@ const isemail = require('isemail')
 const path = require('path')
 const Sequelize = require('sequelize')
 
-const appConfig = require('../../config/app')
-const dbConfig = require('../../config/database')
+const appConfig = require('../config/app')
+const dbConfig = require('../config/database')
 
-const logging = require('../logging')
-const encryption = require('../encryption')
+const logging = require('./logging')
+const encryption = require('./encryption')
 
 const sequelize = new Sequelize(dbConfig)
 
 const db = {
   sequelize,
   Sequelize,
-  Companies: require('../../models/definitions/companies.js')(sequelize, Sequelize),
-  Contacts: require('../../models/definitions/contacts.js')(sequelize, Sequelize),
-  Countries: require('../../models/definitions/countries.js')(sequelize, Sequelize),
-  Labels: require('../../models/definitions/labels.js')(sequelize, Sequelize),
-  OrderDetails: require('../../models/definitions/orderDetails.js')(sequelize, Sequelize),
-  Photos: require('../../models/definitions/photos.js')(sequelize, Sequelize),
-  Products: require('../../models/definitions/products.js')(sequelize, Sequelize),
-  PurchaseOrders: require('../../models/definitions/purchaseOrders.js')(sequelize, Sequelize),
-  Series: require('../../models/definitions/series.js')(sequelize, Sequelize),
-  TagGroups: require('../../models/definitions/tagGroups.js')(sequelize, Sequelize),
-  Tags: require('../../models/definitions/tags.js')(sequelize, Sequelize),
+  Companies: require('../models/definitions/companies.js')(sequelize, Sequelize),
+  Contacts: require('../models/definitions/contacts.js')(sequelize, Sequelize),
+  Countries: require('../models/definitions/countries.js')(sequelize, Sequelize),
+  Labels: require('../models/definitions/labels.js')(sequelize, Sequelize),
+  OrderDetails: require('../models/definitions/orderDetails.js')(sequelize, Sequelize),
+  Photos: require('../models/definitions/photos.js')(sequelize, Sequelize),
+  Products: require('../models/definitions/products.js')(sequelize, Sequelize),
+  PurchaseOrders: require('../models/definitions/purchaseOrders.js')(sequelize, Sequelize),
+  Series: require('../models/definitions/series.js')(sequelize, Sequelize),
+  TagGroups: require('../models/definitions/tagGroups.js')(sequelize, Sequelize),
+  Tags: require('../models/definitions/tags.js')(sequelize, Sequelize),
 }
 
 module.exports = {
@@ -34,20 +34,39 @@ module.exports = {
   init, // create or sync depending on the existence of the db file
   create,
   sync,
-  ensureAdmin,
 }
 
-const contactQueries = require('../../models/queries/contacts')
+const contactQueries = require('../models/queries/contacts')
+
+function init () {
+  return fileExists(path.resolve(dbConfig.storage))
+    .then(existence => {
+      if (existence) {
+        logging.console('Existing database detected')
+        return sync()
+      } else {
+        logging.console('Database missing')
+        return create()
+      }
+    })
+    .then(() => Promise.resolve('Database initialization completed'))
+    .catch(error => {
+      logging.error(error, 'Database initialization failure')
+      return Promise.reject(error)
+    })
+}
 
 function create () {
-  return fs.ensureDir(path.resolve('./data'))
-    .then(() => fs.remove(path.resolve(dbConfig.storage)))
+  return fs.remove(path.resolve(dbConfig.storage))
+    .then(() => fs.ensureDir(path.resolve(dbConfig.location)))
     .then(() => verify())
     .then(() => forcedSyncModels())
     .then(() => establishAssociations())
     .then(() => forcedSyncModels())
+    .then(() => addScopes())
+    .then(() => ensureAdmin())
     .catch(error => {
-      logging.error(error, 'Database creation failure')
+      logging.warning('Database creation failure')
       return Promise.reject(error)
     })
 }
@@ -57,18 +76,10 @@ function sync () {
     .then(() => syncModels())
     .then(() => establishAssociations())
     .then(() => syncModels())
+    .then(() => addScopes())
+    .then(() => ensureAdmin())
     .catch(error => {
-      logging.error(error, 'Database synchronization failure')
-      return Promise.reject(error)
-    })
-}
-
-function init () {
-  return fileExists(path.resolve(dbConfig.storage))
-    .then(existence => existence ? sync() : create())
-    .then(() => Promise.resolve('Database initialization completed'))
-    .catch(error => {
-      logging.error(error, 'Database initialization failure')
+      logging.warning('Database synchronization failure')
       return Promise.reject(error)
     })
 }
@@ -76,8 +87,12 @@ function init () {
 function verify () {
   return sequelize
     .authenticate()
+    .then(() => {
+      logging.console('Database verified')
+      return Promise.resolve()
+    })
     .catch(error => {
-      logging.error(error, 'Database verification failure')
+      logging.warning('Database verification failure')
       return Promise.reject(error)
     })
 }
@@ -95,7 +110,7 @@ function forcedSyncModels () {
     .then(() => db.TagGroups.sync({ force: true }))
     .then(() => db.Tags.sync({ force: true }))
     .catch(error => {
-      logging.error(error, 'Data table synchronization failure')
+      logging.warning('Data table synchronization failure')
       return Promise.reject(error)
     })
 }
@@ -113,7 +128,7 @@ function syncModels () {
     .then(() => db.TagGroups.sync())
     .then(() => db.Tags.sync())
     .catch(error => {
-      logging.error(error, 'Data table synchronization failure')
+      logging.warning('Data table synchronization failure')
       return Promise.reject(error)
     })
 }
@@ -165,7 +180,7 @@ function injectOptions (foreignKey, targetKey, throughModel = null, otherKey = n
 
 function ensureAdmin () {
   return contactQueries
-    .verifyAdminAccount()
+    .verifyMasterAdminAccount()
     .then(queryResults => queryResults
       ? Promise.resolve('Admin account validated')
       : createAdminAccountFromConsole())
@@ -206,7 +221,10 @@ function createAdminAccountFromConsole () {
       })
     })
     .then(() => Promise.resolve('Admin account created'))
-    .catch(error => Promise.reject(error))
+    .catch(error => {
+      console.warning('Admin account creation failure')
+      return Promise.reject(error)
+    })
 }
 
 function consentToCreate () {
@@ -266,4 +284,15 @@ function finalConfirmation () {
       default: false,
     }])
     .then(response => Promise.resolve(response.finalConfirmation))
+}
+
+function addScopes () {
+  require('../models/scopes/companies')(db)
+  require('../models/scopes/contacts')(db)
+  require('../models/scopes/countries')(db)
+  require('../models/scopes/photos')(db)
+  require('../models/scopes/products')(db)
+  require('../models/scopes/purchaseOrders')(db)
+  require('../models/scopes/series')(db)
+  return Promise.resolve()
 }

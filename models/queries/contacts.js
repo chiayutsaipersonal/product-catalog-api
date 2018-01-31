@@ -4,24 +4,33 @@ const db = require('../../controllers/database').db
 const logging = require('../../controllers/logging')
 
 module.exports = {
-  /* lookup queries */
+  // lookup queries
   getBasicInfoById,
+  getDetailedInfoById,
   getCredentialById,
-  verifyAdminAccount,
-  /* insert queries */
+  getCredentialByEmail,
+  verifyMasterAdminAccount,
+  // insert queries
   insert,
 }
 
-/* get login information of a contact record only */
+// get login information of a contact record only
+function getCredentialByEmail (email) {
+  return db.Contacts
+    .scope('credentialsOnly')
+    .findOne({ where: { email } })
+    .then(queryResults => Promise.resolve(queryResults))
+    .catch(error => {
+      logging.error(error, './models/queries/contacts.getCredentialByEmail() errored')
+      return Promise.rejectu(error)
+    })
+}
+
+// get login information of a contact record only
 function getCredentialById (contactId) {
   return db.Contacts
-    .findById(contactId, {
-      attributes: ['id', 'email', 'hashedPassword', 'salt', 'admin'],
-      include: [{
-        model: db.Companies,
-        attributes: ['id', 'host'],
-      }],
-    })
+    .scope('credentialsOnly')
+    .findById(contactId)
     .then(queryResults => Promise.resolve(queryResults))
     .catch(error => {
       logging.error(error, './models/queries/contacts.getCredentialById() errored')
@@ -29,7 +38,7 @@ function getCredentialById (contactId) {
     })
 }
 
-/* get basic info of a contact record */
+// get basic info of a contact record
 function getBasicInfoById (contactId) {
   return db.Contacts
     .findById(contactId)
@@ -40,9 +49,21 @@ function getBasicInfoById (contactId) {
     })
 }
 
-/* verify existence of administrator account in db */
-function verifyAdminAccount () {
-  return db.Contacts.unscoped()
+// get detailed info of a contact record
+function getDetailedInfoById (contactId) {
+  return db.Contacts
+    .scope('detailed')
+    .findById(contactId)
+    .then(queryResults => Promise.resolve(queryResults))
+    .catch(error => {
+      logging.error(error, './models/queries/contacts.getBasicInfoById() errored')
+      return Promise.reject(error)
+    })
+}
+
+// verify existence of the master admin account in db
+function verifyMasterAdminAccount () {
+  return db.Contacts
     .findAll({
       where: {
         name: 'Administrator',
@@ -52,12 +73,12 @@ function verifyAdminAccount () {
     })
     .then(queryResults => Promise.resolve(queryResults.length === 1))
     .catch(error => {
-      logging.error(error, './models/queries/contacts.verifyAdminAccount() errored')
+      logging.error(error, './models/queries/contacts.verifyMasterAdminAccount() errored')
       return Promise.reject(error)
     })
 }
 
-/* insert contact record */
+// insert contact record
 function insert (accountData, transaction = null) {
   let id = !accountData.id
     ? uuidV4().toUpperCase()
