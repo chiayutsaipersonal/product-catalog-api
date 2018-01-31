@@ -2,8 +2,6 @@ const path = require('path')
 
 const logging = require('../controllers/logging')
 
-const hostUrl = require('../config/app').hostUrl
-
 const cannedMessage = {
   200: '200 OK',
   201: '201 Created',
@@ -90,7 +88,7 @@ req.resJson = {
 function json (req, res, next) {
   if (!('resJson' in req)) return next()
   req.resJson.method = req.method.toLowerCase()
-  req.resJson.endpoint = `${hostUrl}${req.originalUrl}`
+  req.resJson.endpoint = req.originalUrl
   req.resJson.statusCode = res.statusCode
   if (!('message' in req.resJson)) {
     req.resJson.message = cannedMessage[res.statusCode.toString()]
