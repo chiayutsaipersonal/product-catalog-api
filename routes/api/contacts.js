@@ -69,7 +69,14 @@ function checkPassword (req, res, next) {
 // create res message when '\login' end point is hit
 function loginMessage (req, res, next) {
   let status = req.registeredUser.admin ? 'admin' : req.registeredUser.company.host ? 'staff' : 'user'
-  req.resJson.message = `account token with ${status} privilege is supplied for 24 hours`
+  req.resJson.message = appConfig.prodMode
+    ? `account token with ${status} privilege is supplied for 24 hours`
+    : {
+      id: req.registeredUser.id,
+      name: req.registeredUser.name,
+      email: req.registeredUser.email,
+      admin: req.registeredUser.admin,
+    }
   return next()
 }
 
@@ -84,17 +91,7 @@ function provideToken (req, res, next) {
       admin: registeredUser.admin,
     }, authConfig.jwtSecret, { expiresIn: '24h' })
     : undefined
-  req.resJson = appConfig.prodMode
-    ? { data: token }
-    : {
-      data: token,
-      message: {
-        id: registeredUser.id,
-        name: registeredUser.name,
-        email: registeredUser.email,
-        admin: registeredUser.admin,
-      },
-    }
+  req.resJson = { data: token }
   return next()
 }
 

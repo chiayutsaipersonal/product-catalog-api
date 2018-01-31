@@ -1,7 +1,7 @@
 module.exports = db => {
   db.Contacts.addScope('credentialsOnly', () => {
     return {
-      attributes: ['id', 'email', 'hashedPassword', 'salt', 'admin'],
+      attributes: ['id', 'email', 'name', 'hashedPassword', 'salt', 'admin'],
       include: [{
         model: db.Companies,
         attributes: ['id', 'host'],
