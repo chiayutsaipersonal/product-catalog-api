@@ -8,8 +8,8 @@ const ormVerbose = false
 
 module.exports = {
   dialect: 'sqlite',
+  location: path.resolve('./data'), // not sqlite standard option
   storage: path.resolve(`./data/${appConfig.reference}.db`),
-  database: appConfig.reference,
   logging: ormVerbose ? logging.warning : false,
   define: {
     underscored: false,
