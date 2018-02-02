@@ -3,7 +3,7 @@ const favicon = require('serve-favicon')
 const path = require('path')
 
 // route handlers
-const responseHandlers = require('../middlewares/responseHandlers')
+const templateResponseHandlers = require('./middlewares').template
 
 const clientRouter = express.Router()
 
@@ -29,7 +29,7 @@ function init (app) {
     return next()
   })
 
-  clientRouter.use(responseHandlers.template)
+  clientRouter.use(templateResponseHandlers)
 
   return Promise.resolve('Routing for app clients registered')
 }

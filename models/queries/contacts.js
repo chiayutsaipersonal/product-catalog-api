@@ -17,12 +17,12 @@ module.exports = {
 // get login information of a contact record only
 function getCredentialByEmail (email) {
   return db.Contacts
-    .scope('credentialsOnly')
+    .scope({ method: ['credentialsOnly'] })
     .findOne({ where: { email } })
     .then(queryResults => Promise.resolve(queryResults))
     .catch(error => {
       logging.error(error, './models/queries/contacts.getCredentialByEmail() errored')
-      return Promise.rejectu(error)
+      return Promise.reject(error)
     })
 }
 
@@ -79,15 +79,16 @@ function verifyMasterAdminAccount () {
 }
 
 // insert contact record
-function insert (accountData, transaction = null) {
-  let id = !accountData.id
-    ? uuidV4().toUpperCase()
-    : accountData.id
-  let query = !transaction
-    ? db.Contacts.create(accountData)
-    : db.Contacts.create(accountData, { transaction })
+// returns promise that resolves to the record id
+function insert (data, transaction = null) {
+  let record = !data.id
+    ? Object.assign({ id: uuidV4().toUpperCase() }, data)
+    : data
+  let query = transaction
+    ? db.Contacts.create(record, { transaction })
+    : db.Contacts.create(record)
   return query
-    .then(() => Promise.resolve(id))
+    .then(() => Promise.resolve(record.id))
     .catch(error => {
       logging.error(error, './models/queries/contacts.insert() errored')
       return Promise.reject(error)

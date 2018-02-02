@@ -10,9 +10,9 @@ const database = require('./controllers/database')
 
 /* load routing modules */
 const preRouting = require('./controllers/preRouting')
-const assetRouter = require('./routes/assetRouter')
-const apiRouter = require('./routes/apiRouter')
-const clientRouter = require('./routes/clientRouter')
+const assetRouter = require('./routing/assetRouter')
+const apiRouter = require('./routing/apiRouter')
+const clientRouter = require('./routing/clientRouter')
 const postRouting = require('./controllers/postRouting')
 
 /* load configurations */

@@ -3,10 +3,18 @@ const multer = require('multer')
 
 const appConfig = require('../../config/app')
 const authConfig = require('../../config/authentication')
+
+const authentication = require('../../controllers/authentication').authentication()
 const encryption = require('../../controllers/encryption')
+
 const contactQueries = require('../../models/queries/contacts')
 
+const parseCompanyData = require('./companies').parseCompanyData
+const parseOrderDetailData = require('./orderDetails').parseOrderDetailData
+const parsePurchaseOrderData = require('./purchaseOrders').parsePurchaseOrderData
+
 module.exports = {
+  // POST /login
   login: [
     multer().none(),
     validatePasswordFormat,
@@ -16,7 +24,28 @@ module.exports = {
     provideToken,
     loginMessage,
   ],
+  // POST /contacts
+  // consider moving to 'POST /purchaseOrders'
+  create: [
+    multer().none(),
+    validatePasswordFormat,
+    parseCompanyData,
+    parseContactData,
+    parseOrderDetailData,
+    parsePurchaseOrderData,
+  ],
+  activateAdminAuthentication,
   autoFindTarget,
+  parseContactData,
+}
+
+// triggers validation for adminsOnly, if:
+// request to create an admin account
+// request to create a passwordless account
+function activateAdminAuthentication (req, res, next) {
+  let a = (('admin' in req.body) && (req.body.admin === 'true'))
+  let b = !('password' in req.body)
+  return a || b ? authentication.adminsOnly(req, res, next) : next()
 }
 
 // find target contact record indicated by the request route.param() with :contactId
@@ -77,6 +106,27 @@ function loginMessage (req, res, next) {
       email: req.registeredUser.email,
       admin: req.registeredUser.admin,
     }
+  return next()
+}
+
+// parsing contact data from request body
+// stores the temp info in req.contactData
+function parseContactData (req, res, next) {
+  let requestBody = req.body
+  let encryptedPassword = 'password' in requestBody
+    ? encryption.sha512(requestBody.password, encryption.saltGen(16))
+    : { hashedPassword: null, salt: null }
+  req.contactData = {
+    email: requestBody.email.toLowerCase(),
+    name: requestBody.name,
+    mobile: requestBody.mobile || undefined,
+    hashedPassword: encryptedPassword.hashedPassword,
+    salt: encryptedPassword.salt,
+    admin: requestBody.admin || undefined,
+  }
+  for (let key in req.contactData) {
+    if (req.contactData[key] === undefined) delete req.contactData[key]
+  }
   return next()
 }
 

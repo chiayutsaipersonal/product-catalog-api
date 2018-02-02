@@ -14,7 +14,11 @@ const params = {
   passReqToCallback: true,
 }
 
-module.exports = function () {
+module.exports = {
+  authentication,
+}
+
+function authentication () {
   let specificUser = new Strategy(params, (req, payload, done) => {
     return identifyContact(payload, done)
   })
@@ -136,7 +140,7 @@ function staffOrAboveCustomCallback (req, res, next) {
       // allow admin access immediately
       if (contact.admin) return next()
       // allow access if account is associated with 'hosting' company
-      if (contact.company.host) return next()
+      if (contact.company && contact.company.host) return next()
       // otherwise, block access
       let customError = new Error('Only hosting company staffs are authorizded')
       customError.status = 403
