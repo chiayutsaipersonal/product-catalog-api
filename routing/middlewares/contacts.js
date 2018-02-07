@@ -7,9 +7,11 @@ const PASS_PHRASE = require('../../config/authentication').jwtSecret
 const db = require('../../controllers/database').db
 const encryption = require('../../controllers/encryption')
 
-const validateJwt = require('./authentication').validateJwt
+const middlewares = require('.')
 
 const Op = db.Sequelize.Op
+
+const contactQueries = require('../../models/queries/contacts')
 
 module.exports = {
   accountCreationMessage,
@@ -45,12 +47,11 @@ function accountCreationMessage (req, res, next) {
   return next()
 }
 
-// find account credential information using req.body.emal
+// find account credential information using req.body.email
 function accountDiscovery (req, res, next) {
   // find the account
-  return db.Contacts
-    .scope({ method: ['credentialsOnly'] })
-    .findOne({ where: { email: req.body.email.toLowerCase() } })
+  return contactQueries
+    .getCredentialByEmail(req.body.email.toLowerCase())
     .then(contact => {
       if (!contact) { // account isn't found
         let error = new Error('Unauthorized')
@@ -69,7 +70,7 @@ function activateAdminPrivilegeCheck (req, res, next) {
   return (
     ('admin' in req.body && req.body.admin === 'true') ||
     !('password' in req.body)
-  ) ? validateJwt({ admin: true })(req, res, next) : next()
+  ) ? middlewares.validateJwt({ admin: true })(req, res, next) : next()
 }
 
 // find target contact record indicated by the request route.param() with :contactId

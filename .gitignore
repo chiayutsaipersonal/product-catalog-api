@@ -6,5 +6,7 @@ data/
 dist/
 coverage/
 
-.env
-config/authentication.js
+/config/sensitiveInfo.js
+/config/authentication.js
+/config/database.js
+/config/email.js
