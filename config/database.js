@@ -5,7 +5,7 @@ const sensitiveInfo = require('./sensitiveInfo')
 
 const logging = require('../controllers/logging')
 
-const databaseLocation = path.resolve('./data')
+const dbLocation = path.resolve('./data')
 const ormVerbose = false
 
 const mysqlConfig = {
@@ -35,12 +35,14 @@ const mysqlConfig = {
     deletedAt: null,
   },
   operatorsAliases: false,
+  migrationStorage: 'json',
+  seederStorage: 'json',
 }
 
 const sqliteConfig = {
   dialect: 'sqlite',
-  location: databaseLocation, // not sqlite standard option
-  storage: path.join(databaseLocation, `${appConfig.reference}.db`),
+  location: dbLocation, // not sqlite standard option
+  storage: path.join(dbLocation, `${appConfig.reference}.db`),
   logging: ormVerbose ? logging.warning : false,
   define: {
     underscored: false,
@@ -52,8 +54,13 @@ const sqliteConfig = {
     deletedAt: null,
   },
   operatorsAliases: false,
+  migrationStorage: 'json',
+  seederStorage: 'json',
 }
 
-module.exports = appConfig.devMode || appConfig.testMode
-  ? sqliteConfig
-  : mysqlConfig
+module.exports = {
+  development: sqliteConfig,
+  test: sqliteConfig,
+  staging: mysqlConfig,
+  production: mysqlConfig,
+}

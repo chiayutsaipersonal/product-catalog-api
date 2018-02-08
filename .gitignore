@@ -6,7 +6,4 @@ data/
 dist/
 coverage/
 
-/config/sensitiveInfo.js
-/config/authentication.js
-/config/database.js
-/config/email.js
+config/sensitiveInfo.js

@@ -7,7 +7,7 @@ const Promise = require('bluebird')
 const Sequelize = require('sequelize')
 
 const appConfig = require('../config/app')
-const dbConfig = require('../config/database')
+const dbConfig = require('../config/database')[appConfig.nodeEnv]
 
 const encryption = require('./encryption')
 const logging = require('./logging')
@@ -15,8 +15,8 @@ const logging = require('./logging')
 const sequelize = new Sequelize(dbConfig)
 
 const db = {
-  sequelize,
   Sequelize,
+  sequelize,
   Companies: require('../models/definitions/companies.js')(sequelize, Sequelize),
   Contacts: require('../models/definitions/contacts.js')(sequelize, Sequelize),
   Countries: require('../models/definitions/countries.js')(sequelize, Sequelize),
@@ -38,7 +38,7 @@ module.exports = {
   sync,
 }
 
-const contactQueries = require('../models/queries/contacts')
+const contactQueries = require('../../models/queries/contacts')
 
 function create () {
   return close()
@@ -145,7 +145,7 @@ function createAdminAccountFromConsole () {
         logging.warning('Declined to create Admin account')
         return process.exit(0)
       }
-      return contactQueries.insert({
+      return contactQueries.insert(db, {
         email,
         name: 'Administrator',
         hashedPassword: encrypted.hashedPassword,
