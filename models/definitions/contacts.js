@@ -65,7 +65,7 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt',
     defaultScope: {
-      attributes: ['id', 'email', 'name', 'mobile', 'companyId'],
+      attributes: ['id', 'email', 'name', 'mobile', 'companyId', 'admin'],
       order: ['name'],
     },
   })
