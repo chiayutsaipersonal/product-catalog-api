@@ -17,7 +17,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
-    "chalk": "^2.3.0",
+    "chalk": "^2.3.1",
     "convert-excel-to-json": "^1.2.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
@@ -37,11 +37,11 @@
     "nodemailer": "^4.4.2",
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.1",
-    "sequelize": "^4.33.0",
+    "sequelize": "^4.33.3",
     "serve-favicon": "^2.4.5",
     "sqlite3": "^3.1.13",
     "uuid": "^3.2.1",
-    "world-countries": "^1.8.1"
+    "world-countries": "^2.0.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",
@@ -69,7 +69,7 @@
     "prod": "SET NODE_ENV=development&& SET PORT=9004&& node server.js",
     "dev": "nodemon server.js",
     "start": "npm run dev",
-    "initSqlite": "SET NODE_ENV=development&& node lib/createDatabase.js",
-    "initMysql": "SET NODE_ENV=staging&& node lib/createDatabase.js"
+    "initSqlite": "SET NODE_ENV=development&& node lib/initDb.js",
+    "initMysql": "SET NODE_ENV=staging&& node lib/initDb.js"
   }
 }

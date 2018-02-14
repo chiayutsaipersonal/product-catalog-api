@@ -13,7 +13,7 @@ module.exports = db => {
     .then(() => db.TagGroups.sync())
     .then(() => db.Tags.sync())
     .then(() => {
-      logging.console('Model synchronized')
+      logging.console('Models synchronized')
       return Promise.resolve(db)
     })
     .catch(error => {

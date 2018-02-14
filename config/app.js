@@ -1,3 +1,5 @@
+const path = require('path')
+
 const sensitiveInfo = require('./sensitiveInfo')
 
 module.exports = {
@@ -15,7 +17,7 @@ module.exports = {
     adminEmail: sensitiveInfo.ADMIN_EMAIL,
     adminPassword: sensitiveInfo.ADMIN_APP_PASSWORD,
   },
-  clientWebpackConfig: null, // absolute path to webpack.conf
+  webpackConfig: path.resolve('../product-catalog-gentry-vue/build/webpack.dev.conf'),
 }
 
 function normalizePort (val) {

@@ -1,9 +1,5 @@
 const express = require('express')
-const favicon = require('serve-favicon')
 const path = require('path')
-
-// route handlers
-const templateResponseHandlers = require('./middlewares').template
 
 const clientRouter = express.Router()
 
@@ -11,25 +7,13 @@ module.exports = { init }
 
 function init (app) {
   app.use('/', clientRouter)
-  clientRouter.use(favicon(path.resolve('./public/favicon.ico')))
 
   clientRouter.get('/', (req, res, next) => {
-    req.resTemplate = {
-      view: 'index',
-      data: { title: 'Index Page' },
-    }
-    return next()
+    return res
+      .status(200)
+      .type('text/html;charset=utf-8')
+      .sendFile(path.resolve('./dist/index.html'))
   })
 
-  clientRouter.get('/admin', (req, res, next) => {
-    req.resTemplate = {
-      view: 'admin',
-      data: { title: 'Admin page' },
-    }
-    return next()
-  })
-
-  clientRouter.use(templateResponseHandlers)
-
-  return Promise.resolve('Routing for app clients registered')
+  return Promise.resolve('Routing for app web client registered')
 }

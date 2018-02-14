@@ -262,7 +262,6 @@ function redirect (req, res, next) {
     return res
       .status(res.statusCode || 301)
       .redirect(req.resRedirect)
-      .end()
   } else {
     return next()
   }

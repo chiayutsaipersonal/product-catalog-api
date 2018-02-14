@@ -3,57 +3,57 @@ const logging = require('../logging')
 module.exports = db => {
   return db.Companies.sync({ force: true })
     .catch(error => {
-      logging.warning('Model \'Companies\' resynchronization failure')
+      logging.warning('\'Companies\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Contacts.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Contacts\' resynchronization failure')
+      logging.warning('\'Contacts\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Countries.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Countries\' resynchronization failure')
+      logging.warning('\'Countries\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Labels.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Labels\' resynchronization failure')
+      logging.warning('\'Labels\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.OrderDetails.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'OrderDetails\' resynchronization failure')
+      logging.warning('\'OrderDetails\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Photos.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Photos\' resynchronization failure')
+      logging.warning('\'Photos\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Products.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Products\' resynchronization failure')
+      logging.warning('\'Products\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.PurchaseOrders.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'PurchaseOrders\' resynchronization failure')
+      logging.warning('\'PurchaseOrders\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Series.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Series\' resynchronization failure')
+      logging.warning('\'Series\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.TagGroups.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'TagGroups\' resynchronization failure')
+      logging.warning('\'TagGroups\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => db.Tags.sync({ force: true }))
     .catch(error => {
-      logging.warning('Model \'Tags\' resynchronization failure')
+      logging.warning('\'Tags\' model resync failure')
       return Promise.reject(error)
     })
     .then(() => {

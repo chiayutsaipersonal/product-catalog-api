@@ -1,4 +1,6 @@
-const logging = require('../controllers/logging')
+const path = require('path')
+
+const logging = require('./logging')
 
 module.exports = {
   init: app => {
@@ -14,9 +16,9 @@ module.exports = {
       logging.error(error, 'Global application error handler invoked')
       if (error.status === 404) {
         return res
-          .status(302)
+          .status(301)
           .type('text/html;charset=utf-8')
-          .render('index', { title: 'Index Page' })
+          .sendFile(path.resolve('./dist/index.html'))
       } else {
         res.locals.message = error.message
         res.locals.error = req.app.get('env') === 'development' ? error : {}
@@ -24,7 +26,6 @@ module.exports = {
         return res.render('error')
       }
     })
-
     return Promise.resolve('Global post-routing middlewares registered')
   },
 }

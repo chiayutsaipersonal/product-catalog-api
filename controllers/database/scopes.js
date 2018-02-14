@@ -8,6 +8,6 @@ module.exports = db => {
   require('../../models/scopes/products')(db)
   require('../../models/scopes/purchaseOrders')(db)
   require('../../models/scopes/series')(db)
-  logging.console('Models scopes registered')
+  logging.console('Model scopes registered')
   return Promise.resolve(db)
 }

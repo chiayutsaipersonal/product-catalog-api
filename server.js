@@ -33,9 +33,9 @@ const preStartupInitSequence = [
   viewEngine(app), // handlebars view engine
   logging.init(app), // morgan
   preRouting.init(app), // app-wide global middlewares
-  clientRouter.init(app), // user interface (server rendered pages)
-  apiRouter.init(app), // api specific routing
   assetRouter.init(app), // static assets
+  apiRouter.init(app), // api specific routing
+  clientRouter.init(app), // index.html
   postRouting.init(app), // app-wide global middlewares
 ]
 logging.warning('Execute server initialization sequence')

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const Promise = require('bluebird')
+const Sequelize = require('sequelize')
 const uuidV4 = require('uuid/v4')
 
 const PASS_PHRASE = require('../../config/authentication').jwtSecret
@@ -9,7 +10,7 @@ const encryption = require('../../controllers/encryption')
 
 const middlewares = require('.')
 
-const Op = db.Sequelize.Op
+const Op = Sequelize.Op
 
 const contactQueries = require('../../models/queries/contacts')
 
