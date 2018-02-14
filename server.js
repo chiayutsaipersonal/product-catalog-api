@@ -10,9 +10,9 @@ const database = require('./controllers/database')
 
 /* load routing modules */
 const preRouting = require('./controllers/preRouting')
-const assetRouter = require('./routes/assetRouter')
-const apiRouter = require('./routes/apiRouter')
-const clientRouter = require('./routes/clientRouter')
+const assetRouter = require('./routing/assetRouter')
+const apiRouter = require('./routing/apiRouter')
+const clientRouter = require('./routing/clientRouter')
 const postRouting = require('./controllers/postRouting')
 
 /* load configurations */
@@ -23,27 +23,25 @@ const appConfig = require('./config/app')
 logging.warning('Initialize Express.js framework')
 const app = express()
 app.set('port', appConfig.port)
-app.set('trust proxy', true)
+app.set('trust proxy', true) // for use with proxy servers
 const server = http.createServer(app)
 
 /* startup sequence */
 logging.warning('Register server [pre-startup] initialization sequence')
 const preStartupInitSequence = [
-  viewEngine(app),
-  logging.init(app),
-  database.init(),
-  database.ensureAdmin(),
-  preRouting.init(app),
-  apiRouter.init(app),
-  assetRouter.init(app),
-  clientRouter.init(app),
-  postRouting.init(app),
+  database.init(), // database
+  viewEngine(app), // handlebars view engine
+  logging.init(app), // morgan
+  preRouting.init(app), // app-wide global middlewares
+  assetRouter.init(app), // static assets
+  apiRouter.init(app), // api specific routing
+  clientRouter.init(app), // index.html
+  postRouting.init(app), // app-wide global middlewares
 ]
 logging.warning('Execute server initialization sequence')
 Promise
   .each(preStartupInitSequence, initMessage => {
     logging.warning(initMessage)
-    return Promise.resolve()
   })
   .then(() => {
     logging.warning('Starting server')
