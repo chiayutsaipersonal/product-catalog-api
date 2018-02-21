@@ -1,17 +1,13 @@
 const nodemailer = require('nodemailer')
 
-const sensitiveInfo = require('./sensitiveInfo')
-
-const useTransport = 'gmail'
-
 const config = {
   pop3: {
-    host: sensitiveInfo.POP3_HOST,
-    port: sensitiveInfo.POP3_PORT,
+    host: process.env.POP3_HOST,
+    port: process.env.POP3_PORT,
     secure: true,
     auth: {
-      user: sensitiveInfo.ADMIN_EMAIL,
-      pass: sensitiveInfo.POP3_PASSWORD,
+      user: process.env.ADMIN_EMAIL,
+      pass: process.env.POP3_PASSWORD,
     },
     tls: {
       rejectUnauthorized: false,
@@ -21,13 +17,15 @@ const config = {
     service: 'gmail',
     auth: {
       type: 'OAuth2',
-      user: sensitiveInfo.ADMIN_EMAIL,
-      clientId: sensitiveInfo.GMAIL_CLIENT_ID,
-      clientSecret: sensitiveInfo.GMAIL_CLIENT_SECRET,
-      refreshToken: sensitiveInfo.GMAIL_REFRESH_TOKEN,
-      accessToken: sensitiveInfo.GMAIL_ACCESS_TOKEN,
+      user: process.env.ADMIN_EMAIL,
+      clientId: process.env.GMAIL_CLIENT_ID,
+      clientSecret: process.env.GMAIL_CLIENT_SECRET,
+      refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+      accessToken: process.env.GMAIL_ACCESS_TOKEN,
     },
   },
 }
 
-module.exports = nodemailer.createTransport(config[useTransport])
+module.exports = transportName => {
+  return nodemailer.createTransport(config[transportName])
+}

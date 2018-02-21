@@ -7,7 +7,7 @@ const jsonResponseHandler = require('../middlewares').json
 const errorResponseHandler = require('../middlewares').error
 
 // route handlers
-const authentication = require('../../controllers/authentication').authentication()
+const authentication = require('../../controllers/authentication')
 
 const apiRouter = express.Router()
 const apiV1Router = express.Router()

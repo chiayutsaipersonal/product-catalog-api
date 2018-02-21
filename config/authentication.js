@@ -1,6 +1,6 @@
-const sensitiveInfo = require('./sensitiveInfo')
+require('dotenv').config()
 
 module.exports = {
-  jwtSecret: sensitiveInfo.JWT_SECRET,
+  jwtSecret: process.env.JWT_SECRET,
   enforced: true,
 }

@@ -1,7 +1,8 @@
+require('dotenv').config()
+
 const path = require('path')
 
 const appConfig = require('./app')
-const sensitiveInfo = require('./sensitiveInfo')
 
 const logging = require('../controllers/logging')
 
@@ -10,11 +11,11 @@ const ormVerbose = false
 
 const mysqlConfig = {
   dialect: 'mysql',
-  host: sensitiveInfo.MYSQL_HOST,
-  port: sensitiveInfo.MYSQL_PORT,
-  database: sensitiveInfo.MYSQL_DATABASE,
-  username: sensitiveInfo.MYSQL_USERNAME,
-  password: sensitiveInfo.MYSQL_PASSWORD,
+  host: process.env.MYSQL_HOST,
+  port: process.env.MYSQL_PORT,
+  database: process.env.MYSQL_DATABASE,
+  username: process.env.MYSQL_USERNAME,
+  password: process.env.MYSQL_PASSWORD,
   logging: ormVerbose ? logging.warning : false,
   timezone: appConfig.timezone,
   pool: {
@@ -35,8 +36,8 @@ const mysqlConfig = {
     deletedAt: null,
   },
   operatorsAliases: false,
-  migrationStorage: 'json',
-  seederStorage: 'json',
+  // migrationStorage: 'json',
+  // seederStorage: 'json',
 }
 
 const sqliteConfig = {
@@ -54,13 +55,17 @@ const sqliteConfig = {
     deletedAt: null,
   },
   operatorsAliases: false,
-  migrationStorage: 'json',
-  seederStorage: 'json',
+  // migrationStorage: 'json',
+  // seederStorage: 'json',
 }
 
-module.exports = {
+const configOptions = {
   development: sqliteConfig,
   test: sqliteConfig,
   staging: mysqlConfig,
   production: mysqlConfig,
+}
+
+module.exports = environment => {
+  return configOptions[environment]
 }

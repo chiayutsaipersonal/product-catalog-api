@@ -6,4 +6,4 @@ data/
 dist/
 coverage/
 
-config/sensitiveInfo.js
+.env
