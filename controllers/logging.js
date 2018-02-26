@@ -12,17 +12,21 @@ function init (app) {
   let testMode = process.env.NODE_ENV === 'test'
   let devMode = process.env.NODE_ENV === 'development'
   if (!testMode) {
-    app.use(morgan(!devMode ? 'short' : 'dev', {
-      skip: (req, res) => res.statusCode < 400,
-      stream: process.stderr,
-    }))
-    app.use(morgan(!devMode ? 'short' : 'dev', {
-      skip: (req, res) => res.statusCode >= 400,
-      stream: process.stdout,
-    }))
-    return Promise.resolve('On screen API logging activated')
+    app.use(
+      morgan(!devMode ? 'short' : 'dev', {
+        skip: (req, res) => res.statusCode < 400,
+        stream: process.stderr,
+      })
+    )
+    app.use(
+      morgan(!devMode ? 'short' : 'dev', {
+        skip: (req, res) => res.statusCode >= 400,
+        stream: process.stdout,
+      })
+    )
+    return Promise.resolve('Console logging activated')
   } else {
-    return Promise.resolve('On screen API logging is inactive while testing')
+    return Promise.resolve('Console logging is inactive while testing')
   }
 }
 
@@ -40,10 +44,13 @@ function warningToConsole (warningMessage) {
 
 function errorToConsole (error, customMessage = null) {
   if (customMessage) {
-    console.error(`${chalk.bgRed.bold(error.name)} - ${chalk.red.bold(customMessage)}`)
+    console.error(
+      `${chalk.bgRed.bold(error.name)} - ${chalk.red.bold(customMessage)}`
+    )
   } else {
     console.error(`${chalk.bgRed.bold(error.name)}`)
   }
+  warningToConsole(error.origin)
   warningToConsole(error.message)
   warningToConsole(error.stack)
 }

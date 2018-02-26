@@ -2,9 +2,9 @@ require('dotenv').config()
 
 const path = require('path')
 
-const appConfig = require('./app')
+const appConfig = require('config/app')
 
-const logging = require('../controllers/logging')
+const logging = require('controllers/logging')
 
 const dbLocation = path.resolve('./data')
 const ormVerbose = false

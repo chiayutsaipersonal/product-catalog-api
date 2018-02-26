@@ -1,15 +1,15 @@
-const logging = require('../logging')
+const logging = require('controllers/logging')
 
-const authenticate = require('./authenticate')
-const register = require('./register')
-const scopes = require('./scopes')
-const sync = require('./sync')
-const associate = require('./associate')
+const authenticate = require('controllers/database/authenticate')
+const register = require('controllers/database/register')
+const scopes = require('controllers/database/scopes')
+const sync = require('controllers/database/sync')
+const associate = require('controllers/database/associate')
 
-let databaseInstance = null
+var databaseInstance = null
 
 module.exports = {
-  db: databaseInstance,
+  db: () => databaseInstance,
   init,
 }
 

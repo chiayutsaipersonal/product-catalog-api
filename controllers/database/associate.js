@@ -1,4 +1,4 @@
-const logging = require('../logging')
+const logging = require('controllers/logging')
 
 module.exports = db => {
   // contact info relationships\

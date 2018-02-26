@@ -1,10 +1,11 @@
 const tagGroupRouter = require('express').Router()
 
 // middlewares
-const notImplemented = require('../../middlewares').notImplemented
-const routingTest = require('../../middlewares').routingTest
+const notImplemented = require('routing/middlewares/notImplemented')
+const routingTest = require('routing/middlewares/routingTest')
 
-tagGroupRouter.route('/')
+tagGroupRouter
+  .route('/')
   .get(routingTest)
   .post(notImplemented)
   .put(notImplemented)

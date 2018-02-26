@@ -7,7 +7,7 @@ const config = {
     secure: true,
     auth: {
       user: process.env.ADMIN_EMAIL,
-      pass: process.env.POP3_PASSWORD,
+      pass: process.env.ADMIN_EMAIL_PASSWORD,
     },
     tls: {
       rejectUnauthorized: false,

@@ -4,7 +4,7 @@
 
 global.Promise = require('bluebird')
 
-const server = require('../server')
+const server = require('server')
 const chai = require('chai')
 const expect = chai.expect
 const chaiHttp = require('chai-http')
@@ -14,15 +14,21 @@ chai.use(chaiHttp)
 describe('Status and content', () => {
   describe('Main page', () => {
     it('has 200 status', () => {
-      chai.request(server).get('/')
+      chai
+        .request(server)
+        .get('/')
         .then(response => expect(response).to.have.status(200))
     })
     it('has text as response', () => {
-      chai.request(server).get('/')
+      chai
+        .request(server)
+        .get('/')
         .then(response => expect(response).to.be.text)
     })
     it('text is \'Hello World\'', () => {
-      chai.request(server).get('/')
+      chai
+        .request(server)
+        .get('/')
         .then(response => {
           expect(response.text).to.equal('Hello World')
         })

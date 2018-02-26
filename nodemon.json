@@ -4,12 +4,11 @@
   "colors": true,
   "ext": "js hbs",
   "delay": 200,
-  "watch": [
-    "."
-  ],
+  "watch": ["."],
   "ignore": [],
   "env": {
     "NODE_ENV": "development",
+    "NODE_PATH": "C:\\projects\\product-catalog\\api-server-express",
     "PORT": 9004
   },
   "runOnChangeOnly": false,

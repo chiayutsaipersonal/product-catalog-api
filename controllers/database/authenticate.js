@@ -1,9 +1,9 @@
-const logging = require('../logging')
-
 const Sequelize = require('sequelize')
 
-const appConfig = require('../../config/app')
-const dbConfig = require('../../config/database')[appConfig.nodeEnv]
+const appConfig = require('config/app')
+const dbConfig = require('config/database')(appConfig.nodeEnv)
+
+const logging = require('controllers/logging')
 
 module.exports = () => {
   let db = {

@@ -1,9 +1,9 @@
-node_modules/
-
 backup/
-deprecated/
-data/
-dist/
 coverage/
+data/
+deprecated/
+dist/
+node_modules/
+uploads/
 
 .env

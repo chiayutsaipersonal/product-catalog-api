@@ -1,10 +1,11 @@
 const purchaseOrderRouter = require('express').Router()
 
 // middlewares
-const notImplemented = require('../../middlewares').notImplemented
-const routingTest = require('../../middlewares').routingTest
+const notImplemented = require('routing/middlewares/notImplemented')
+const routingTest = require('routing/middlewares/routingTest')
 
-purchaseOrderRouter.route('/purchaseOrders/:purchaseOrderId')
+purchaseOrderRouter
+  .route('/purchaseOrders/:purchaseOrderId')
   .get(routingTest) // get purchase order by id
   .post(notImplemented)
   .put(notImplemented)

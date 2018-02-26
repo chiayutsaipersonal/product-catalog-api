@@ -4,20 +4,13 @@ const http = require('http')
 const Promise = require('bluebird')
 
 /* load controller modules */
-const logging = require('./controllers/logging')
-const viewEngine = require('./controllers/viewEngine')
-const database = require('./controllers/database')
-
-/* load routing modules */
-const preRouting = require('./controllers/preRouting')
-const assetRouter = require('./routing/assetRouter')
-const apiRouter = require('./routing/apiRouter')
-const clientRouter = require('./routing/clientRouter')
-const postRouting = require('./controllers/postRouting')
+const logging = require('controllers/logging')
+const viewEngine = require('controllers/viewEngine')
+const database = require('controllers/database')
 
 /* load configurations */
 logging.warning('Loading server configurations...')
-const appConfig = require('./config/app')
+const appConfig = require('config/app')
 
 /* initialize Express framework */
 logging.warning('Initialize Express.js framework')
@@ -32,26 +25,35 @@ const preStartupInitSequence = [
   database.init(), // database
   viewEngine(app), // handlebars view engine
   logging.init(app), // morgan
-  preRouting.init(app), // app-wide global middlewares
-  assetRouter.init(app), // static assets
-  apiRouter.init(app), // api specific routing
-  clientRouter.init(app), // index.html
-  postRouting.init(app), // app-wide global middlewares
 ]
 logging.warning('Execute server initialization sequence')
-Promise
-  .each(preStartupInitSequence, initMessage => {
-    logging.warning(initMessage)
+Promise.each(preStartupInitSequence, initMessage => {
+  logging.warning(initMessage)
+})
+  .then(() => {
+    /* routing module setup */
+    logging.warning('Register server [routing] setup sequence')
+    const routingSetupSequence = [
+      require('routing/preRouting').init(app), // app-wide global middlewares
+      require('routing/assetRouter').init(app), // static assets
+      require('routing/apiRouter').init(app), // api specific routing
+      require('routing/clientRouter').init(app), // index.html
+      require('routing/postRouting').init(app), // app-wide global middlewares
+    ]
+    return Promise.each(routingSetupSequence, setupMessage => {
+      logging.warning(setupMessage)
+    })
   })
   .then(() => {
     logging.warning('Starting server')
     server.listen(appConfig.port)
     server.on('listening', () => {
       let addr = server.address()
-      let bind = typeof addr === 'string'
-        ? 'pipe ' + addr
-        : 'port ' + addr.port
-      logging.warning(`Server started in [${process.env.NODE_ENV}] mode and listening on ` + bind)
+      let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
+      logging.warning(
+        `Server started in [${process.env.NODE_ENV}] mode and listening on ` +
+          bind
+      )
     })
     server.on('error', error => {
       if (error.syscall !== 'listen') throw error
@@ -62,7 +64,8 @@ Promise
         case 'EADDRINUSE':
           logging.error(`${appConfig.port} is already in use`)
           process.exit(1)
-        default: throw error
+        default:
+          throw error
       }
     })
     return Promise.resolve()

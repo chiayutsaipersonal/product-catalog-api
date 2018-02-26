@@ -1,24 +1,27 @@
 const companyRouter = require('express').Router()
 
 // middlewares
-const notImplemented = require('../../middlewares').notImplemented
-const routingTest = require('../../middlewares').routingTest
+const notImplemented = require('routing/middlewares/notImplemented')
+const routingTest = require('routing/middlewares/routingTest')
 
-companyRouter.route('/hostingCompanies')
+companyRouter
+  .route('/hostingCompanies')
   .get(routingTest) // get hosting companies' information
   .post(notImplemented)
   .put(notImplemented)
   .patch(notImplemented)
   .delete(notImplemented)
 
-companyRouter.route('/companies')
+companyRouter
+  .route('/companies')
   .get(routingTest) // get company dataset
   .post(routingTest) // insert a company record
   .put(notImplemented)
   .patch(notImplemented)
   .delete(notImplemented)
 
-companyRouter.route('/companies/:companyId')
+companyRouter
+  .route('/companies/:companyId')
   .get(routingTest) // get one company record
   .post(notImplemented)
   .put(routingTest) // update company information

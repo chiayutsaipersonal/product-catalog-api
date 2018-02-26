@@ -7,11 +7,11 @@ const cron = require('node-cron')
 const hbs = require('nodemailer-express-handlebars')
 const path = require('path')
 
-const emailTransporter = require('../config/email')
-const eVars = require('../config/eVars')
+const emailTransporter = require('config/email')
+const eVars = require('config/eVars')
 
-const db = require('./database')
-const logging = require('./logging')
+const db = require('controllers/database/index').db()
+const logging = require('controllers/logging')
 
 // how often to trigger email sendig actions
 // const BROADCAST_FREQUENCY = '0 * * * * *' // every 1 minute
@@ -29,16 +29,19 @@ const CHECK_FREQUENCY = '*/30 * * * * *' // every 30 seconds
 // const CHECK_FREQUENCY = '*/5 * * * * *' // every 5 seconds
 // const CHECK_FREQUENCY = '* * * * * *' // every second
 
-emailTransporter.use('compile', hbs({
-  viewEngin: {
-    defaultLayout: 'main',
-    extname: '.hbs',
-    layoutsDir: path.join(__dirname, '../../server/views/layouts'),
-    partialsDir: path.join(__dirname, '../../server/views/partials'),
-  },
-  viewPath: path.join(__dirname, '../../server/views'),
-  extName: '.hbs',
-}))
+emailTransporter.use(
+  'compile',
+  hbs({
+    viewEngin: {
+      defaultLayout: 'main',
+      extname: '.hbs',
+      layoutsDir: path.join(__dirname, '../../server/views/layouts'),
+      partialsDir: path.join(__dirname, '../../server/views/partials'),
+    },
+    viewPath: path.join(__dirname, '../../server/views'),
+    extName: '.hbs',
+  })
+)
 
 let emailQueue = []
 
@@ -59,15 +62,15 @@ function broadcastByEmail () {
   // if no emails in queue, exits...
   if (emailQueue.length === 0) return Promise.resolve()
   // sends the first email
-  return emailQueue[0]
-    .sendAction
+  return emailQueue[0].sendAction
     .then(response => {
       let updateContent = {}
       updateContent[emailQueue[0].type] = true
       // if success, mark the record as completed depends on type
       // { notified: true} or { contacted: true }
-      return db.PurchaseOrders
-        .update(updateContent, { where: { id: emailQueue[0].purchaseOrderId } })
+      return db.PurchaseOrders.update(updateContent, {
+        where: { id: emailQueue[0].purchaseOrderId },
+      })
         .then(() => {
           emailQueue.shift()
           logging.warning(response)
@@ -85,9 +88,10 @@ function broadcastByEmail () {
 function checkPendingPurchaseOrders () {
   logging.warning('checking emails')
   // look for pending orders ('contacted' or 'notified' is false)
-  return db.PurchaseOrders
-    .scope({ method: ['pending'] })
-    .findAll({ where: { id: { [db.Sequelize.Op.notIn]: getPurchaseOrderIdLists() } } })
+  return db.PurchaseOrders.scope({ method: ['pending'] })
+    .findAll({
+      where: { id: { [db.Sequelize.Op.notIn]: getPurchaseOrderIdLists() } },
+    })
     .then(pendingPurchaseOrders => {
       // go through each pending order
       pendingPurchaseOrders.forEach(purchaseOrder => {
@@ -143,15 +147,21 @@ function createContactEmail (purchaseOrder) {
     //   products: purchaseOrder.products,
     //   issuedDate: (new Date()).toISOString().substring(0, 10)
     // },
-    attachments: [{
-      path: eVars.devMode
-        ? path.join(__dirname, '../../client/assets/images/logos/gentryLogoSmall.png')
-        : path.resolve('./dist/public/gentryLogoSmall.png'),
-    }, {
-      path: eVars.devMode
-        ? path.join(__dirname, '../../client/assets/brouchure/brouchure.pdf')
-        : path.resolve('./dist/public/brouchure.pdf'),
-    }],
+    attachments: [
+      {
+        path: eVars.devMode
+          ? path.join(
+            __dirname,
+            '../../client/assets/images/logos/gentryLogoSmall.png'
+          )
+          : path.resolve('./dist/public/gentryLogoSmall.png'),
+      },
+      {
+        path: eVars.devMode
+          ? path.join(__dirname, '../../client/assets/brouchure/brouchure.pdf')
+          : path.resolve('./dist/public/brouchure.pdf'),
+      },
+    ],
   }
   return emailTransporter.sendMail(emailOptions)
 }
