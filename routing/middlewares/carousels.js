@@ -11,7 +11,7 @@ module.exports = {
 }
 
 /**
- * list available carousel
+ * list available carousel files in './dist/assets/img/carousels' folder
  * @param {*} req
  * @param {*} res
  * @param {*} next

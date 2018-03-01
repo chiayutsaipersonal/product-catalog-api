@@ -7,10 +7,7 @@ const findOne = require('models/queries/index').findOne
 module.exports = getContactCredentialsByEmail
 
 /**
- * get contact credentials by email (submitted thru req.body.email) lookup
- * also denies access according to parameter settings
- * failIfNotFound: used to block execution if an existing contact is required
- * failIfFound: used to block execution if contact already existed with the same email
+ * get contact credentials by email lookup.  Email is retrieved from req[property].  Also denies access according to parameter settings
  * @param {*} param0
  */
 function getContactCredentialsByEmail ({

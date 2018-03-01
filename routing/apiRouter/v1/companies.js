@@ -1,20 +1,14 @@
 const companyRouter = require('express').Router()
 
 // middlewares
+// const validateStaffOrAbove = require('controllers/authentication/index').authentication.staffOrAbove
+
 const notImplemented = require('routing/middlewares/notImplemented')
 const routingTest = require('routing/middlewares/routingTest')
 
 companyRouter
-  .route('/hostingCompanies')
-  .get(routingTest) // get hosting companies' information
-  .post(notImplemented)
-  .put(notImplemented)
-  .patch(notImplemented)
-  .delete(notImplemented)
-
-companyRouter
   .route('/companies')
-  .get(routingTest) // get company dataset
+  .get(routingTest) // list companies
   .post(routingTest) // insert a company record
   .put(notImplemented)
   .patch(notImplemented)
@@ -26,6 +20,6 @@ companyRouter
   .post(notImplemented)
   .put(routingTest) // update company information
   .patch(notImplemented)
-  .delete(routingTest) // delete a company
+  .delete(notImplemented)
 
 module.exports = companyRouter

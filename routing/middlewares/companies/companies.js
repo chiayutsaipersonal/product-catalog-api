@@ -178,19 +178,6 @@ function getRecordCount () {
     .catch(error => Promise.reject(error))
 }
 
-// get company dataset
-function getRecords (req, res, next) {
-  return db.Companies
-    .scope({ method: ['detailed'] })
-    .findAll(req.queryOptions)
-    .then(data => {
-      req.resJson = { data }
-      next()
-      return Promise.resolve()
-    })
-    .catch(error => next(error))
-}
-
 // insert company record
 function insertRecord (req, res, next) {
   return db.Companies.create({

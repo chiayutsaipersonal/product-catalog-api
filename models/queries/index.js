@@ -1,6 +1,6 @@
 const uuidV4 = require('uuid/v4')
 
-const logging = require('controllers/logging')
+const db = require('controllers/database/index').db()
 const genCustErr = require('controllers/index').genCustErr
 const getFuncName = require('controllers/index').getFuncName
 
@@ -13,6 +13,7 @@ module.exports = {
   findById,
   findOne,
   findOrCreate,
+  rawQueries,
   update,
 }
 
@@ -25,7 +26,7 @@ function bulkCreate ({
     ? model.bulkCreate(payload, { transaction })
     : model.bulkCreate(payload)
   return query.then(() => Promise.resolve()).catch(error => {
-    logging.warning(`${__filename}.${getFuncName(bulkCreate)} errored`)
+    error.origin = `${__filename}.${getFuncName(bulkCreate)}`
     return Promise.reject(error)
   })
 }
@@ -35,7 +36,7 @@ function count ({ model = handleMissingModelError(count), criteria = {} }) {
     .count({ where: criteria })
     .then(recordCount => Promise.resolve(recordCount))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(count)} errored`)
+      error.origin = `${__filename}.${getFuncName(count)}`
       return Promise.reject(error)
     })
 }
@@ -52,7 +53,7 @@ function create ({
   return query
     .then(() => Promise.resolve(data.id.toUpperCase()))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(create)} errored`)
+      error.origin = `${__filename}.${getFuncName(create)}`
       return Promise.reject(error)
     })
 }
@@ -68,7 +69,7 @@ function destroy ({
   return query
     .then(recordCount => Promise.resolve(recordCount))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(destroy)} errored`)
+      error.origin = `${__filename}.${getFuncName(destroy)}`
       return Promise.reject(error)
     })
 }
@@ -78,7 +79,7 @@ function findAll ({ model = handleMissingModelError(findAll), criteria = {} }) {
     .findAll({ where: criteria })
     .then(queryResults => Promise.resolve(queryResults))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(findAll)} errored`)
+      error.origin = `${__filename}.${getFuncName(findAll)}`
       return Promise.reject(error)
     })
 }
@@ -88,7 +89,7 @@ function findById ({ model = handleMissingModelError(findById), id = null }) {
     .findById(id)
     .then(queryResult => Promise.resolve(queryResult))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(findById)} errored`)
+      error.origin = `${__filename}.${getFuncName(findById)}`
       return Promise.reject(error)
     })
 }
@@ -98,7 +99,7 @@ function findOne ({ model = handleMissingModelError(findOne), criteria = {} }) {
     .findOne({ where: criteria })
     .then(queryResult => Promise.resolve(queryResult))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(findOne)} errored`)
+      error.origin = `${__filename}.${getFuncName(findOne)}`
       return Promise.reject(error)
     })
 }
@@ -114,13 +115,26 @@ function findOrCreate ({
   return query
     .spread((queryResult, created) => Promise.resolve(queryResult || created))
     .catch(error => {
-      logging.warning(`${__filename}.${getFuncName(findOrCreate)}() errored`)
+      error.origin = `${__filename}.${getFuncName(findOrCreate)}`
       return Promise.reject(error)
     })
 }
 
+function rawQueries ({
+  queryString = handleMissingModelError(rawQueries),
+  transaction = null,
+}) {
+  return db.sequelize
+    .query(queryString, { logging: console.log })
+    .spread((result, metadata) => Promise.resolve(result))
+    .catch(error => {
+      error.origin = `${__filename}.${getFuncName(rawQueries)}`
+      Promise.reject(error)
+    })
+}
+
 function update ({
-  model = handleMissingModelError(),
+  model = handleMissingModelError(update),
   payload = {},
   criteria = {},
   transaction = null,
@@ -129,7 +143,7 @@ function update ({
     ? model.update(payload, { where: criteria, transaction })
     : model.update(payload, { where: criteria })
   return query.then(result => Promise.resolve(result[0])).catch(error => {
-    logging.warning(`${__filename}.${getFuncName(update)}() errored`)
+    error.origin = `${__filename}.${getFuncName(update)}`
     return Promise.reject(error)
   })
 }

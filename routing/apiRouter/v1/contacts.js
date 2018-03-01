@@ -30,9 +30,6 @@ const validateStaffOrAbove = require('controllers/authentication/index')
 const validateStaffOrAboveAndSpecificUsers = require('controllers/authentication/index')
   .authentication.staffOrAboveAndSpecificUsers
 
-// search for contacts
-contactRouter.route('/contactSearch').get(routingTest)
-
 // applying for a jwt by submitting account credentials in order to interact with the APIs
 contactRouter
   .route('/login')

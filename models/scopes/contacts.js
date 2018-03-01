@@ -2,10 +2,12 @@ module.exports = db => {
   db.Contacts.addScope('credentialsOnly', () => {
     return {
       attributes: ['id', 'email', 'name', 'hashedPassword', 'salt', 'admin'],
-      include: [{
-        model: db.Companies,
-        attributes: ['id', 'host'],
-      }],
+      include: [
+        {
+          model: db.Companies,
+          attributes: ['id', 'host'],
+        },
+      ],
     }
   })
 
@@ -13,10 +15,7 @@ module.exports = db => {
     return {
       attributes: ['id', 'email', 'name', 'mobile', 'companyId', 'admin'],
       include: [{ model: db.Companies }],
-      order: [
-        [db.Companies, 'title'],
-        ['name'],
-      ],
+      order: [[db.Companies, 'title'], ['name']],
     }
   })
 }

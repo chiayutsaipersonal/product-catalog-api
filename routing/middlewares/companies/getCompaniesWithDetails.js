@@ -3,24 +3,24 @@ const getFuncName = require('controllers/index').getFuncName
 
 const findAll = require('models/queries/index').findAll
 
-module.exports = getContactsWithDetails
+module.exports = getCompaniesWithDetails
 
 /**
  * get detailed contact record by id stored in req.contactId
  * @param {*} param0
  */
-function getContactsWithDetails (criteria = {}) {
+function getCompaniesWithDetails (criteria = {}) {
   return (req, res, next) => {
-    let model = db.Contacts.scope({ method: ['detailed'] })
+    let model = db.Companies.scope({ method: ['detailed'] })
     return findAll({ model, criteria })
-      .then(detailedContacts => {
-        req.contacts = detailedContacts
+      .then(detailedCompanies => {
+        req.companies = detailedCompanies
         next()
         return Promise.resolve()
       })
       .catch(error => {
         error.statusCode = 500
-        error.origin = `${__filename}.${getFuncName(getContactsWithDetails)}`
+        error.origin = `${__filename}.${getFuncName(getCompaniesWithDetails)}`
         return next(error)
       })
   }

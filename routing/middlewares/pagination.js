@@ -5,7 +5,7 @@ module.exports = {
   appendPaginationData,
 }
 
-function pagination (getRecordCountFn) {
+function pagination (getRecordCountFn = () => Promise.resolve(0)) {
   return async (req, res, next) => {
     let query = req.query
 

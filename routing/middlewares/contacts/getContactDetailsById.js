@@ -30,6 +30,7 @@ function getContactDetailsById ({ failIfNotFound = true } = {}) {
         return Promise.resolve()
       })
       .catch(error => {
+        error.statusCode = 500
         error.origin = custErr.origin
         return next(error)
       })
