@@ -9,6 +9,7 @@ describe('#min', () => {
     done()
   })
   it('should return undefined when array is empty', done => {
+    // test
     const minimum = min([])
     assert.isUndefined(minimum)
     done()
