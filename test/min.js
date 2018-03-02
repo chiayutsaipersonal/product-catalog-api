@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const min = require('lib/min')
+const min = require('../lib/min')
 
 describe('#min', () => {
   it('should return the minimum in array', done => {

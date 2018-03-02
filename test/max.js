@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const max = require('lib/max')
+const max = require('../lib/max')
 
 describe('#max', () => {
   it('should return the maximum in array', done => {

@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 
-const average = require('lib/average')
+const average = require('../lib/average')
 
 describe('#average', () => {
   it('should return the average of array', done => {
